@@ -20,7 +20,9 @@ public class Employee {
     @NotBlank(message = "Name cannot be blank")
     private String name;
 
-    @NotBlank(message = "Department cannot be blank")
-    private String department;
+    @NotNull(message = "Department cannot be null")
+    @ManyToOne // Many employees belong to one department
+    @JoinColumn(name = "department_id") // Foreign key column in employee table
+    private Department department; // The department this employee belongs to
 
 }
