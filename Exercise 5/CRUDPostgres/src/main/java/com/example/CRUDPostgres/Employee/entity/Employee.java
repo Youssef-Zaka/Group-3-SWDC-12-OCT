@@ -1,5 +1,6 @@
 package com.example.CRUDPostgres.Employee.entity;
 
+import com.example.CRUDPostgres.Department.entity.Department;
 import jakarta.persistence.*;
 import lombok.*; // Import Lombok annotations
 import jakarta.validation.constraints.*; // Import validation annotations
@@ -18,6 +19,7 @@ public class Employee {
     private long id;
 
     @NotBlank(message = "Name cannot be blank")
+    @Size(min = 2, message = "Name must be at least 2 characters long") // Validate length
     private String name;
 
     @NotNull(message = "Department cannot be null")
