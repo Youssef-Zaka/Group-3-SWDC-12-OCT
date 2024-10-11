@@ -2,6 +2,7 @@ package com.example.CRUDPostgres.Employee.services;
 
 import com.example.CRUDPostgres.Department.dto.DepartmentDTO;
 import com.example.CRUDPostgres.Department.entity.Department;
+import com.example.CRUDPostgres.Department.exceptions.DepartmentNotFoundException;
 import com.example.CRUDPostgres.Department.services.DepartmentService;
 import com.example.CRUDPostgres.Employee.dto.EmployeeDTO;
 import com.example.CRUDPostgres.Employee.entity.Employee;
@@ -9,6 +10,10 @@ import com.example.CRUDPostgres.Employee.mapper.EmployeeMapper;
 import com.example.CRUDPostgres.Employee.repository.EmployeeRepository;
 import com.example.CRUDPostgres.Employee.exceptions.EmployeeNotFoundException; // Import custom exception
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -44,14 +49,14 @@ public class EmployeeService {
 
 
     /**
-     * Retrieves all employees.
+     * Retrieves a paginated list of employees with sorting support.
      *
-     * @return A list of all employees as DTOs.
+     * @param pageable The Pageable object containing pagination and sorting information.
+     * @return A paginated list of EmployeeDTOs.
      */
-    public List<EmployeeDTO> getAllEmployees() {
-        return employeeRepository.findAll().stream()
-                .map(employeeMapper::toDTO) // Convert each entity to DTO
-                .collect(Collectors.toList());
+    public Page<EmployeeDTO> getAllEmployees(@NonNull Pageable pageable) {
+        Page<Employee> employeesPage = employeeRepository.findAll(pageable);
+        return employeesPage.map(employeeMapper::toDTO); // Convert Page<Employee> to Page<EmployeeDTO>
     }
 
     /**
@@ -72,6 +77,7 @@ public class EmployeeService {
      * @param id The ID of the employee to update.
      * @param employeeDTO The DTO representation of the employee with updated information.
      * @return The updated employee as a DTO.
+     * @throws EmployeeNotFoundException if the employee does not exist.
      */
     public EmployeeDTO updateEmployee(Long id, EmployeeDTO employeeDTO) {
         Employee employeeToUpdate = employeeRepository.findById(id)
@@ -79,8 +85,10 @@ public class EmployeeService {
 
         // Update fields
         employeeToUpdate.setName(employeeDTO.getName());
-        // Set department if needed (could use a DepartmentDTO or ID)
-        // employeeToUpdate.setDepartment(employeeDTO.getDepartment()); // Uncomment if using department in DTO
+
+        // Fetch and update department if necessary
+        Department department = departmentService.getDepartmentEntityById(employeeDTO.getDepartmentId());
+        employeeToUpdate.setDepartment(department);
 
         employeeToUpdate = employeeRepository.save(employeeToUpdate); // Save updated entity
         return employeeMapper.toDTO(employeeToUpdate); // Convert back to DTO to return
@@ -90,11 +98,28 @@ public class EmployeeService {
      * Deletes an employee by ID.
      *
      * @param id The ID of the employee to be deleted.
+     * @throws EmployeeNotFoundException if the employee does not exist.
      */
     public void deleteEmployee(Long id) {
         if (!employeeRepository.existsById(id)) {
             throw new EmployeeNotFoundException("Employee with ID " + id + " not found.");
         }
         employeeRepository.deleteById(id); // Delete employee
+    }
+
+    /**
+     * Retrieves employees by department ID.
+     *
+     * @param departmentId The ID of the department.
+     * @return A list of EmployeeDTOs associated with the given department ID.
+     * @throws DepartmentNotFoundException if the department does not exist.
+     */
+    public List<EmployeeDTO> getEmployeesByDepartmentId(Long departmentId) {
+        // Check if department exists, otherwise throw an exception
+        departmentService.getDepartmentEntityById(departmentId); // Will throw DepartmentNotFoundException if not found
+
+        // Fetch employees associated with the department
+        List<Employee> employees = employeeRepository.findByDepartmentId(departmentId);
+        return employees.stream().map(employeeMapper::toDTO).collect(Collectors.toList());
     }
 }

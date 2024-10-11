@@ -3,6 +3,8 @@ package com.example.CRUDPostgres.Employee.controller;
 import com.example.CRUDPostgres.Employee.dto.EmployeeDTO; // Import the EmployeeDTO
 import com.example.CRUDPostgres.Employee.services.EmployeeService; // Import the EmployeeService
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,13 +34,14 @@ public class EmployeeController {
     }
 
     /**
-     * Retrieves all employees.
+     * Retrieves a paginated list of employees with sorting support.
      *
-     * @return ResponseEntity containing a list of all employee DTOs and a status of 200 (OK).
+     * @param pageable Pageable object with page number, size, and sorting options.
+     * @return ResponseEntity containing a paginated list of EmployeeDTOs.
      */
     @GetMapping
-    public ResponseEntity<List<EmployeeDTO>> getAllEmployees() {
-        List<EmployeeDTO> employees = employeeService.getAllEmployees(); // Fetch all employees as DTOs
+    public ResponseEntity<Page<EmployeeDTO>> getAllEmployees(Pageable pageable) {
+        Page<EmployeeDTO> employees = employeeService.getAllEmployees(pageable);
         return ResponseEntity.ok(employees);
     }
 
@@ -77,5 +80,17 @@ public class EmployeeController {
     public ResponseEntity<Void> deleteEmployee(@PathVariable Long id) {
         employeeService.deleteEmployee(id); // Delete employee
         return ResponseEntity.noContent().build(); // Return no content response
+    }
+
+    /**
+     * Retrieves employees by department ID.
+     *
+     * @param departmentId The ID of the department.
+     * @return ResponseEntity containing a list of EmployeeDTOs associated with the given department.
+     */
+    @GetMapping("/department/{departmentId}")
+    public ResponseEntity<List<EmployeeDTO>> getEmployeesByDepartmentId(@PathVariable Long departmentId) {
+        List<EmployeeDTO> employees = employeeService.getEmployeesByDepartmentId(departmentId);
+        return ResponseEntity.ok(employees);
     }
 }
