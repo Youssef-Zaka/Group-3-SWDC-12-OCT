@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -78,4 +79,18 @@ public class DepartmentService {
         }
         departmentRepository.deleteById(id);
     }
+
+    /**
+     * Retrieves a Department entity by its ID. Used internally for operations that require the entity object itself.
+     *
+     * @param id The ID of the department to retrieve.
+     * @return The Department entity if found.
+     * @throws DepartmentNotFoundException if the department with the given ID does not exist.
+     */
+    public Department getDepartmentEntityById(Long id) {
+        return departmentRepository.findById(id)
+                .orElseThrow(() -> new DepartmentNotFoundException("Department with ID " + id + " not found."));
+    }
+
+
 }
