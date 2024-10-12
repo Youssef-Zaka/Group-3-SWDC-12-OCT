@@ -2,6 +2,7 @@ package com.example.CRUDPostgres.Employee.controller;
 
 import com.example.CRUDPostgres.Employee.dto.EmployeeDTO; // Import the EmployeeDTO
 import com.example.CRUDPostgres.Employee.services.EmployeeService; // Import the EmployeeService
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -28,7 +29,7 @@ public class EmployeeController {
      * @return ResponseEntity containing the created employee DTO and a status of 201 (Created).
      */
     @PostMapping
-    public ResponseEntity<EmployeeDTO> addEmployee(@RequestBody EmployeeDTO employeeDTO) {
+    public ResponseEntity<EmployeeDTO> addEmployee(@Valid @RequestBody EmployeeDTO employeeDTO) {
         EmployeeDTO createdEmployee = employeeService.saveEmployee(employeeDTO); // Save employee and get the created DTO
         return ResponseEntity.status(201).body(createdEmployee);
     }
@@ -65,7 +66,7 @@ public class EmployeeController {
      * @return ResponseEntity containing the updated employee DTO or a 404 (Not Found) status if the employee does not exist.
      */
     @PutMapping("/{id}")
-    public ResponseEntity<EmployeeDTO> updateEmployee(@PathVariable Long id, @RequestBody EmployeeDTO employeeDTO) {
+    public ResponseEntity<EmployeeDTO> updateEmployee(@PathVariable Long id,@Valid @RequestBody EmployeeDTO employeeDTO) {
         EmployeeDTO updatedEmployee = employeeService.updateEmployee(id, employeeDTO); // Update employee and get updated DTO
         return ResponseEntity.ok(updatedEmployee);
     }

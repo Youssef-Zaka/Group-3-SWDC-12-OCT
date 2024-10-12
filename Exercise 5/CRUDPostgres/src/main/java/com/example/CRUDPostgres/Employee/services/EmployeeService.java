@@ -39,7 +39,10 @@ public class EmployeeService {
      * @return The saved employee as a DTO.
      */
     public EmployeeDTO saveEmployee(EmployeeDTO employeeDTO) {
-
+        // Validate department ID
+        if (employeeDTO.getDepartmentId() == null) {
+            throw new DepartmentNotFoundException("Department ID is required.");
+        }
         // Fetch the department based on the provided department ID
         Department department = departmentService.getDepartmentEntityById(employeeDTO.getDepartmentId());
         Employee employee = employeeMapper.toEntity(employeeDTO, department); // Pass DTO and DepartmentDTO

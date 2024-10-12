@@ -2,6 +2,7 @@ package com.example.CRUDPostgres.Department.controller;
 
 import com.example.CRUDPostgres.Department.dto.DepartmentDTO; // Import the DepartmentDTO
 import com.example.CRUDPostgres.Department.services.DepartmentService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,7 +27,7 @@ public class DepartmentController {
      * @return ResponseEntity containing the created department DTO and a status of 201 (Created).
      */
     @PostMapping
-    public ResponseEntity<DepartmentDTO> createDepartment(@RequestBody DepartmentDTO departmentDTO) {
+    public ResponseEntity<DepartmentDTO> createDepartment(@Valid @RequestBody DepartmentDTO departmentDTO) {
         DepartmentDTO createdDepartment = departmentService.createDepartment(departmentDTO);
         return ResponseEntity.status(201).body(createdDepartment);
     }

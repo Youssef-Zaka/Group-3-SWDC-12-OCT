@@ -16,7 +16,7 @@ public class Employee {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @NotBlank(message = "Name cannot be blank")
     @Size(min = 2, message = "Name must be at least 2 characters long") // Validate length
@@ -24,7 +24,7 @@ public class Employee {
 
     @NotNull(message = "Department cannot be null")
     @ManyToOne // Many employees belong to one department
-    @JoinColumn(name = "department_id") // Foreign key column in employee table
+    @JoinColumn(name = "department_id", nullable = false) // Foreign key column in employee table
     private Department department; // The department this employee belongs to
 
 }

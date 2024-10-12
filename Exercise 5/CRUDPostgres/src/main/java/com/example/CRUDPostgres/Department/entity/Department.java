@@ -17,7 +17,7 @@ public class Department {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @NotBlank(message = "Department name cannot be blank")
     @Size(min = 2, message = "Name must be at least 2 characters long") // Validate length

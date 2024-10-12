@@ -3,10 +3,12 @@ package com.example.CRUDPostgres.Department.services;
 import com.example.CRUDPostgres.Department.dto.DepartmentDTO;
 import com.example.CRUDPostgres.Department.entity.Department;
 import com.example.CRUDPostgres.Department.exceptions.DepartmentNotFoundException;
+import com.example.CRUDPostgres.Department.exceptions.DepartmentReferencedException;
 import com.example.CRUDPostgres.Department.exceptions.DuplicateDepartmentException;
 import com.example.CRUDPostgres.Department.mapper.DepartmentMapper;
 import com.example.CRUDPostgres.Department.repository.DepartmentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -77,7 +79,12 @@ public class DepartmentService {
         if (!departmentRepository.existsById(id)) {
             throw new DepartmentNotFoundException("Department with ID " + id + " not found.");
         }
-        departmentRepository.deleteById(id);
+        try {
+            departmentRepository.deleteById(id);
+        } catch (DataIntegrityViolationException ex) {
+            // Detect foreign key constraint violation and throw custom exception
+            throw new DepartmentReferencedException("Cannot delete department because it is referenced by employees.");
+        }
     }
 
     /**

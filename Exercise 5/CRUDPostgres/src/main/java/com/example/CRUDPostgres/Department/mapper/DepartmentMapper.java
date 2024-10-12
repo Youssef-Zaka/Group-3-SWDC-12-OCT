@@ -18,7 +18,9 @@ public class DepartmentMapper {
     // Convert DepartmentDTO to Department entity
     public Department toEntity(DepartmentDTO dto) {
         Department department = new Department();
-        department.setId(dto.getId());
+        if (dto.getId() != null && dto.getId() > 0) {  // Check if the ID is not null and positive
+            department.setId(dto.getId());
+        }
         department.setName(dto.getName());
         return department;
     }

@@ -48,7 +48,7 @@ public class EmployeeMapper {
      */
     public Employee toEntity(EmployeeDTO dto, Department department) {
         Employee employee = new Employee();
-        employee.setId(dto.getId());
+        if (dto.getId() != null) employee.setId(dto.getId());
         employee.setName(dto.getName());
 
         // Set the provided Department object directly
