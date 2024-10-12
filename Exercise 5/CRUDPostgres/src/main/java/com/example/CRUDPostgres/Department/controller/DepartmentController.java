@@ -5,6 +5,7 @@ import com.example.CRUDPostgres.Department.services.DepartmentService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,7 +15,7 @@ import java.util.List;
  * Provides endpoints for CRUD operations on departments.
  */
 @RestController
-@RequestMapping("/departments")
+@RequestMapping("api/departments")
 public class DepartmentController {
 
     @Autowired
@@ -27,6 +28,7 @@ public class DepartmentController {
      * @return ResponseEntity containing the created department DTO and a status of 201 (Created).
      */
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<DepartmentDTO> createDepartment(@Valid @RequestBody DepartmentDTO departmentDTO) {
         DepartmentDTO createdDepartment = departmentService.createDepartment(departmentDTO);
         return ResponseEntity.status(201).body(createdDepartment);
@@ -38,6 +40,7 @@ public class DepartmentController {
      * @return ResponseEntity containing a list of all department DTOs and a status of 200 (OK).
      */
     @GetMapping
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<List<DepartmentDTO>> getAllDepartments() {
         List<DepartmentDTO> departments = departmentService.getAllDepartments();
         return ResponseEntity.ok(departments);
@@ -50,6 +53,7 @@ public class DepartmentController {
      * @return ResponseEntity containing the department DTO if found, or a 404 (Not Found) status if not found.
      */
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<DepartmentDTO> getDepartmentById(@PathVariable Long id) {
         DepartmentDTO department = departmentService.getDepartmentById(id);
         return department != null ? ResponseEntity.ok(department) : ResponseEntity.notFound().build();
@@ -62,6 +66,7 @@ public class DepartmentController {
      * @return ResponseEntity with a status of 204 (No Content) after deletion.
      */
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteDepartment(@PathVariable Long id) {
         departmentService.deleteDepartment(id);
         return ResponseEntity.noContent().build();

@@ -1,11 +1,7 @@
 package com.example.CRUDPostgres.Department.controller;
 
-
 import com.example.CRUDPostgres.Department.dto.DepartmentDTO;
-import com.example.CRUDPostgres.Department.exceptions.DepartmentNotFoundException;
-import com.example.CRUDPostgres.Department.exceptions.DuplicateDepartmentException;
 import com.example.CRUDPostgres.Department.services.DepartmentService;
-import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -13,13 +9,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Arrays;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -49,25 +45,27 @@ class DepartmentControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "USER")  // Mock an authenticated user with USER role
     void testCreateDepartment() throws Exception {
         when(departmentService.createDepartment(any(DepartmentDTO.class))).thenReturn(departmentDTO1);
 
         mockMvc.perform(post("/departments")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"name\":\"HR\"}"))
-                .andExpect(status().isCreated())
+                .andExpect(status().isCreated())  // Expecting 201 Created
                 .andExpect(jsonPath("$.id").value(1L))
                 .andExpect(jsonPath("$.name").value("HR"))
                 .andDo(print());
     }
 
     @Test
+    @WithMockUser(roles = "USER")  // Mock an authenticated user with USER role
     void testGetAllDepartments() throws Exception {
         List<DepartmentDTO> departmentList = Arrays.asList(departmentDTO1, departmentDTO2);
         when(departmentService.getAllDepartments()).thenReturn(departmentList);
 
         mockMvc.perform(get("/departments"))
-                .andExpect(status().isOk())
+                .andExpect(status().isOk())  // Expecting 200 OK
                 .andExpect(jsonPath("$[0].id").value(1L))
                 .andExpect(jsonPath("$[0].name").value("HR"))
                 .andExpect(jsonPath("$[1].id").value(2L))
@@ -76,32 +74,34 @@ class DepartmentControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "USER")  // Mock an authenticated user with USER role
     void testGetDepartmentById() throws Exception {
         when(departmentService.getDepartmentById(1L)).thenReturn(departmentDTO1);
 
         mockMvc.perform(get("/departments/1"))
-                .andExpect(status().isOk())
+                .andExpect(status().isOk())  // Expecting 200 OK
                 .andExpect(jsonPath("$.id").value(1L))
                 .andExpect(jsonPath("$.name").value("HR"))
                 .andDo(print());
     }
 
     @Test
+    @WithMockUser(roles = "USER")  // Mock an authenticated user with USER role
     void testGetDepartmentByIdNotFound() throws Exception {
         when(departmentService.getDepartmentById(1L)).thenReturn(null);
 
         mockMvc.perform(get("/departments/1"))
-                .andExpect(status().isNotFound())
+                .andExpect(status().isNotFound())  // Expecting 404 Not Found
                 .andDo(print());
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")  // Mock an authenticated user with ADMIN role
     void testDeleteDepartment() throws Exception {
         Mockito.doNothing().when(departmentService).deleteDepartment(1L);
 
         mockMvc.perform(delete("/departments/1"))
-                .andExpect(status().isNoContent())
+                .andExpect(status().isNoContent())  // Expecting 204 No Content
                 .andDo(print());
     }
-
 }
