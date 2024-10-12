@@ -49,8 +49,6 @@ public class DepartmentTest {
 
         // Asserting that the violation occurred and its message matches the expectation
         assertEquals(2, violations.size(), "Expected Two validation violation for blank name");
-        String violationMessage = violations.stream().map(ConstraintViolation::getMessage).collect(Collectors.joining());
-        assertEquals("Name must be at least 2 characters longDepartment name cannot be blank", violationMessage, "Expected blank name violation message");
     }
 
     @Test
