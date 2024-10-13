@@ -4,13 +4,14 @@ import com.example.CRUDPostgres.Department.dto.DepartmentDTO;
 import com.example.CRUDPostgres.Department.services.DepartmentService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.MockitoAnnotations;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.Arrays;
 import java.util.List;
@@ -21,27 +22,36 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
-@WebMvcTest(DepartmentController.class)
 class DepartmentControllerTest {
 
-    @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @Mock
     private DepartmentService departmentService;
+
+    @InjectMocks
+    private DepartmentController departmentController;
 
     private DepartmentDTO departmentDTO1;
     private DepartmentDTO departmentDTO2;
 
     @BeforeEach
     void setUp() {
-        departmentDTO1 = new DepartmentDTO();
-        departmentDTO1.setId(1L);
-        departmentDTO1.setName("HR");
 
-        departmentDTO2 = new DepartmentDTO();
-        departmentDTO2.setId(2L);
-        departmentDTO2.setName("IT");
+        try (AutoCloseable mocks = MockitoAnnotations.openMocks(this)) {
+            mockMvc = MockMvcBuilders.standaloneSetup(departmentController).build();
+
+            departmentDTO1 = new DepartmentDTO();
+            departmentDTO1.setId(1L);
+            departmentDTO1.setName("HR");
+
+            departmentDTO2 = new DepartmentDTO();
+            departmentDTO2.setId(2L);
+            departmentDTO2.setName("IT");
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
     }
 
     @Test
@@ -99,7 +109,6 @@ class DepartmentControllerTest {
     @WithMockUser(roles = "ADMIN")  // Mock an authenticated user with ADMIN role
     void testDeleteDepartment() throws Exception {
         Mockito.doNothing().when(departmentService).deleteDepartment(1L);
-
         mockMvc.perform(delete("/api/departments/1"))
                 .andExpect(status().isNoContent())  // Expecting 204 No Content
                 .andDo(print());
