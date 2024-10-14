@@ -1,6 +1,7 @@
 package com.example.CRUDPostgres.Employee.entity;
 
 import com.example.CRUDPostgres.Department.entity.Department;
+import com.example.CRUDPostgres.Shared.Auditable;
 import jakarta.persistence.*;
 import lombok.*; // Import Lombok annotations
 import jakarta.validation.constraints.*; // Import validation annotations
@@ -10,9 +11,10 @@ import jakarta.validation.constraints.*; // Import validation annotations
 @Entity
 @Table(name = "employee")
 @Data // Lombok annotation for getters, setters, toString, equals, and hashCode
+@EqualsAndHashCode(callSuper = false) // Lombok annotation to generate equals and hashCode methods
 @NoArgsConstructor // Lombok annotation for no-args constructor
 @AllArgsConstructor // Lombok annotation for all-args constructor
-public class Employee {
+public class Employee extends Auditable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
